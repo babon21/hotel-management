@@ -1,13 +1,14 @@
 package http
 
 import (
-	"github.com/babon21/hotel-management/domain"
+	"errors"
+	"github.com/babon21/hotel-management/internal/domain"
+	"github.com/babon21/hotel-management/internal/room/usecase"
+	"github.com/babon21/hotel-management/internal/utils"
 	"github.com/babon21/hotel-management/pkg/delivery/http/api"
-	"github.com/babon21/hotel-management/room/usecase"
 	"github.com/labstack/echo"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"net/http"
-	"strconv"
 )
 
 // ResponseError represent the reseponse error struct
@@ -20,7 +21,7 @@ type RoomHandler struct {
 	RoomUsecase usecase.RoomUsecase
 }
 
-// NewRoomHandler will initialize the articles/ resources endpoint
+// NewRoomHandler will initialize the rooms/ resources endpoint
 func NewRoomHandler(e *echo.Echo, us usecase.RoomUsecase) {
 	handler := &RoomHandler{
 		RoomUsecase: us,
@@ -37,17 +38,17 @@ func (a *RoomHandler) GetRoomList(c echo.Context) error {
 
 	sortField := formSortField(sortParam)
 	if sortField == usecase.ErrField {
-		// TODO bad request
+		return c.JSONPretty(http.StatusBadRequest, ResponseError{Message: "sort_by field must be price or date_added"}, "  ")
 	}
 
 	sortOrder := formSortOrder(orderParam)
 	if sortOrder == usecase.ErrOrder {
-		// TODO bad request
+		return c.JSONPretty(http.StatusBadRequest, ResponseError{Message: "order_by field must be asc or desc"}, "  ")
 	}
 
 	rooms, err := a.RoomUsecase.GetList(sortField, sortOrder)
 	if err != nil {
-		// TODO
+		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
 	}
 
 	return c.JSONPretty(http.StatusOK, rooms, "  ")
@@ -75,27 +76,17 @@ func formSortField(sortValue string) usecase.SortField {
 	}
 }
 
-//func isRequestValid(m *domain.Article) (bool, error) {
-//	validate := validator.New()
-//	err := validate.Struct(m)
-//	if err != nil {
-//		return false, err
-//	}
-//	return true, nil
-//}
-
 // Add will store the room by given request body
 func (a *RoomHandler) Add(c echo.Context) (err error) {
 	var request api.AddRoomRequest
 	err = c.Bind(&request)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return c.JSONPretty(http.StatusUnprocessableEntity, ResponseError{Message: err.Error()}, "  ")
 	}
 
-	//var ok bool
-	//if ok, err = isRequestValid(&request); !ok {
-	//	return c.JSON(http.StatusBadRequest, err.Error())
-	//}
+	if err := isRequestValid(&request); err != nil {
+		return c.JSONPretty(http.StatusBadRequest, ResponseError{Message: err.Error()}, "  ")
+	}
 
 	room := domain.Room{
 		Price:       request.Price,
@@ -104,26 +95,28 @@ func (a *RoomHandler) Add(c echo.Context) (err error) {
 
 	id, err := a.RoomUsecase.Add(&room)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
 	}
 
-	response := api.AddRoomResponse{Id: strconv.FormatUint(id, 10)}
+	response := api.AddRoomResponse{Id: id}
 
 	return c.JSONPretty(http.StatusOK, response, "  ")
 }
 
+func isRequestValid(request *api.AddRoomRequest) error {
+	if !utils.IsNumeric(request.Price) {
+		return errors.New("price is not number")
+	}
+	return nil
+}
+
 // Delete will delete room by given param
 func (a *RoomHandler) Delete(c echo.Context) error {
-	idP, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
-	}
+	id := c.Param("id")
 
-	id := int64(idP)
-
-	err = a.RoomUsecase.Delete(id)
+	err := a.RoomUsecase.Delete(id)
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
 	}
 
 	return c.NoContent(http.StatusNoContent)
@@ -134,14 +127,12 @@ func getStatusCode(err error) int {
 		return http.StatusOK
 	}
 
-	logrus.Error(err)
+	log.Error().Msg(err.Error())
 	switch err {
 	case domain.ErrInternalServerError:
 		return http.StatusInternalServerError
 	case domain.ErrNotFound:
 		return http.StatusNotFound
-	case domain.ErrConflict:
-		return http.StatusConflict
 	default:
 		return http.StatusInternalServerError
 	}
