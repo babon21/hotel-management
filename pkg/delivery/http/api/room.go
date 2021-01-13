@@ -8,11 +8,3 @@ type AddRoomRequest struct {
 type AddRoomResponse struct {
 	Id string `json:"id"`
 }
-
-//type AddBookingRequest struct {
-//
-//}
-//
-//type AddBookingResponse struct {
-//
-//}

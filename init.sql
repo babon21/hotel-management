@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS room;
 
 CREATE TABLE room (
     id SERIAL PRIMARY KEY,
-    price INTEGER NOT NULL,
+    price NUMERIC NOT NULL,
     description TEXT NOT NULL,
     date_added TIMESTAMP NOT NULL
 );

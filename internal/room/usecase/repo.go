@@ -1,12 +1,14 @@
 package usecase
 
 import (
-	"github.com/babon21/hotel-management/domain"
+	"github.com/babon21/hotel-management/internal/domain"
 )
 
 // RoomRepository represent the room's repository contract
 type RoomRepository interface {
 	GetList(sortField SortField, sortOrder SortOrder) ([]domain.Room, error)
-	Save(room *domain.Room) (uint64, error)
-	Remove(roomId int64) error
+	Save(room *domain.Room) (string, error)
+	Remove(roomId string) error
+	domain.ExistenceChecker
+	//CheckRoomExists(roomId string) bool
 }
