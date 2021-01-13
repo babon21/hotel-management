@@ -1,4 +1,4 @@
-version: "2.3"
+version: "3.1"
 services:
   postgres:
     image: library/postgres:13
@@ -13,18 +13,18 @@ services:
     ports:
       - 5432:5432
 
-  #  web:
-  #    build:
-  #      context: .
-  #      dockerfile: Dockerfile
-  #    container_name: article_management_api
-  #    ports:
-  #      - 9090:9090
-  #    depends_on:
-  #      mysql:
-  #        condition: service_healthy
-  #    volumes:
-  #      - ./config.json:/app/config.json
+  web:
+    build: .
+    container_name: hotel
+    restart: on-failure
+    ports:
+      - 9090:9090
+    depends_on:
+      - postgres
+#        mysql:
+#          condition: service_healthy
+#      volumes:
+#        - ./config.json:/app/config.json
 
   #  mysql:
   #    image: mysql:5.7
