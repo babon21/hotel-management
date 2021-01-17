@@ -51,13 +51,14 @@ func formGetListQuery(sortField usecase.SortField, sortOrder usecase.SortOrder) 
 		order = "DESC"
 	}
 
-	return fmt.Sprintf("SELECT * FROM room ORDER BY %s %s", sortField, order)
+	return fmt.Sprintf("SELECT id,price,description,date_added FROM room ORDER BY %s %s", sortField, order)
 }
 
-func (repo *postgresRoomRepository) Save(room *domain.Room) (string, error) {
+func (repo *postgresRoomRepository) Save(room *domain.Room) error {
 	var id string
 	err := repo.Conn.QueryRow("INSERT INTO room(price, description, date_added) VALUES ($1, $2, $3) RETURNING id", room.Price, room.Description, time.Now()).Scan(&id)
-	return id, err
+	room.ID = id
+	return err
 }
 
 func (repo *postgresRoomRepository) Remove(roomId string) error {

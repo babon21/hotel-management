@@ -93,12 +93,11 @@ func (a *RoomHandler) Add(c echo.Context) (err error) {
 		Description: request.Description,
 	}
 
-	id, err := a.RoomUsecase.Add(&room)
-	if err != nil {
+	if err := a.RoomUsecase.Add(&room); err != nil {
 		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
 	}
 
-	response := api.AddRoomResponse{Id: id}
+	response := api.AddRoomResponse{Id: room.ID}
 
 	return c.JSONPretty(http.StatusOK, response, "  ")
 }

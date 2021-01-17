@@ -7,7 +7,7 @@ import (
 // RoomUsecase represent the room's usecases
 type RoomUsecase interface {
 	GetList(sortField SortField, sortOrder SortOrder) ([]domain.Room, error)
-	Add(room *domain.Room) (string, error)
+	Add(room *domain.Room) error
 	Delete(roomId string) error
 }
 
@@ -23,10 +23,14 @@ func NewRoomUsecase(roomRepository RoomRepository) RoomUsecase {
 }
 
 func (useCase *roomUsecase) GetList(sortField SortField, sortOrder SortOrder) ([]domain.Room, error) {
-	return useCase.roomRepo.GetList(sortField, sortOrder)
+	list, err := useCase.roomRepo.GetList(sortField, sortOrder)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
-func (useCase *roomUsecase) Add(room *domain.Room) (string, error) {
+func (useCase *roomUsecase) Add(room *domain.Room) error {
 	return useCase.roomRepo.Save(room)
 }
 
