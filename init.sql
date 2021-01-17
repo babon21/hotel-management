@@ -20,10 +20,9 @@ DROP TABLE IF EXISTS booking;
 
 CREATE TABLE booking (
     id SERIAL PRIMARY KEY,
-    room_id INTEGER NOT NULL REFERENCES room,
+    room_id INTEGER NOT NULL REFERENCES room ON DELETE CASCADE,
     start_date VARCHAR(13) NOT NULL,
     expiration_date VARCHAR(13) NOT NULL
 );
 
 CREATE INDEX booking_room_id_fkey ON booking (room_id);
--- TODO delete cascade room and booking
