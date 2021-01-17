@@ -21,8 +21,6 @@ import (
 
 func main() {
 	conf := config.Init()
-	fmt.Println(conf.Server.Port)
-	//conf.Database.Host = "localhost"
 
 	connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s", conf.Database.Username,
 		conf.Database.Password, conf.Database.Host, conf.Database.Port, conf.Database.DbName)
