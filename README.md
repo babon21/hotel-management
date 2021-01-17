@@ -32,7 +32,7 @@ make lint
 make test
 ```
 
-#Реализация
+# Реализация
 - Язык программирования Go
 - База данных PostgreSQL
 - HTTP JSON API
@@ -52,7 +52,7 @@ make test
 - Генерация mock-объектов для unit-тестирования - `mockery`
 - Логирование с помощью `zerolog`
 
-#API
+# API
 ## API для работы с каталогом номеров отеля:
 ### POST /rooms
 **Добавить номер отеля.**
@@ -64,7 +64,7 @@ make test
 }
 ```
 
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request POST 'localhost:9090/rooms' \
@@ -89,7 +89,7 @@ curl --request POST 'localhost:9090/rooms' \
 - sort_by (available values: price, date_added)
 - order_by (available values: asc, desc)
 
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request GET 'localhost:9090/rooms?sort_by=date_added&order_by=desc'
@@ -108,7 +108,7 @@ curl --request GET 'localhost:9090/rooms?sort_by=date_added&order_by=desc'
 ### DELETE /rooms/:id
 **Удалить номер отеля и все его брони.**
 Принимает на вход ID номера отеля.
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request DELETE 'localhost:9090/rooms/1'
@@ -121,7 +121,7 @@ curl --request DELETE 'localhost:9090/rooms/1'
 ### POST /bookings
 **Добавить бронь.**
 Принимает на вход существующий ID номера отеля, дату начала, дату окончания брони. Возвращает ID брони.
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request POST 'localhost:9090/bookings' \
@@ -141,7 +141,7 @@ curl --request POST 'localhost:9090/bookings' \
 ### GET /bookings
 **Получить список броней номера отеля.** 
 Принимает на вход ID номера отеля. Возвращает список бронирований, каждое бронирование содержит ID, дату начала, дату окончания. Бронирования отсортированы по дате начала.
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request GET 'localhost:9090/bookings?room_id=2'
@@ -159,7 +159,7 @@ curl --request GET 'localhost:9090/bookings?room_id=2'
 ### DELETE /bookings/:id
 **Удалить бронь.**
 Принимает на вход ID брони.
-####Пример запроса и ответа
+#### Пример запроса и ответа
 Запрос:
 ```
 curl --request DELETE 'localhost:9090/bookings/1'
