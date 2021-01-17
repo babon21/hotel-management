@@ -12,9 +12,6 @@ unittest:
 clean:
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 
-docker:
-	docker build -t go-clean-arch .
-
 run:
 	docker-compose up --build -d
 
