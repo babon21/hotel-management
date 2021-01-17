@@ -25,16 +25,17 @@ func (repo *postgresBookingRepository) CheckBookingExists(bookingId string) bool
 }
 
 func (repo *postgresBookingRepository) GetList(roomId string) ([]domain.Booking, error) {
-	getListQuery := "SELECT * FROM booking WHERE room_id = $1 ORDER BY start_date ASC"
+	getListQuery := "SELECT id,room_id,start_date,expiration_date FROM booking WHERE room_id = $1 ORDER BY start_date ASC"
 	bookings := make([]domain.Booking, 0, 1)
 	err := repo.Conn.Select(&bookings, getListQuery, roomId)
 	return bookings, err
 }
 
-func (repo *postgresBookingRepository) Save(booking *domain.Booking) (string, error) {
+func (repo *postgresBookingRepository) Save(booking *domain.Booking) error {
 	var id string
 	err := repo.Conn.QueryRow("INSERT INTO booking(room_id, start_date, expiration_date) VALUES ($1, $2, $3) RETURNING id", booking.RoomId, booking.StartDate, booking.ExpirationDate).Scan(&id)
-	return id, err
+	booking.ID = id
+	return err
 }
 
 func (repo *postgresBookingRepository) Remove(bookingId string) error {

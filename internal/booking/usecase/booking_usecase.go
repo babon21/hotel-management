@@ -7,7 +7,7 @@ import (
 // BookingUsecase represent the booking's usecases
 type BookingUsecase interface {
 	GetList(roomId string) ([]domain.Booking, error)
-	Add(booking *domain.Booking) (string, error)
+	Add(booking *domain.Booking) error
 	Delete(bookingId string) error
 }
 
@@ -25,15 +25,18 @@ func NewBookingUsecase(bookingRepository BookingRepository, roomChecker domain.E
 }
 
 func (useCase *bookingUsecase) GetList(roomId string) ([]domain.Booking, error) {
-	return useCase.bookingRepository.GetList(roomId)
+	list, err := useCase.bookingRepository.GetList(roomId)
+	if err != nil {
+		return nil, err
+	}
+	return list, err
 }
 
-func (useCase *bookingUsecase) Add(booking *domain.Booking) (string, error) {
+func (useCase *bookingUsecase) Add(booking *domain.Booking) error {
 	if !useCase.roomChecker.CheckExistence(booking.RoomId) {
-		return "", domain.ErrNotFound
+		return domain.ErrNotFound
 	}
-	bookingId, err := useCase.bookingRepository.Save(booking)
-	return bookingId, err
+	return useCase.bookingRepository.Save(booking)
 }
 
 func (useCase *bookingUsecase) Delete(bookingId string) error {

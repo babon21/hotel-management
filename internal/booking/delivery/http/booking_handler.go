@@ -34,6 +34,10 @@ func NewBookingHandler(e *echo.Echo, us usecase.BookingUsecase) {
 // GetBookingList will fetch the booking based on given params
 func (a *BookingHandler) GetBookingList(c echo.Context) error {
 	roomId := c.QueryParam("room_id")
+	if roomId == "" {
+		return c.JSONPretty(http.StatusBadRequest, ResponseError{Message: errors.New("room_id param not found").Error()}, "  ")
+	}
+
 	bookings, err := a.BookingUsecase.GetList(roomId)
 	if err != nil {
 		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
@@ -60,12 +64,11 @@ func (a *BookingHandler) Add(c echo.Context) (err error) {
 		ExpirationDate: request.ExpirationDate,
 	}
 
-	id, err := a.BookingUsecase.Add(&booking)
-	if err != nil {
+	if err := a.BookingUsecase.Add(&booking); err != nil {
 		return c.JSONPretty(getStatusCode(err), ResponseError{Message: err.Error()}, "  ")
 	}
 
-	response := api.AddRoomResponse{Id: id}
+	response := api.AddRoomResponse{Id: booking.ID}
 
 	return c.JSONPretty(http.StatusOK, response, "  ")
 }

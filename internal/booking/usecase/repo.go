@@ -7,7 +7,7 @@ import (
 // BookingRepository represent the booking's repository contract
 type BookingRepository interface {
 	GetList(roomId string) ([]domain.Booking, error)
-	Save(booking *domain.Booking) (string, error)
+	Save(booking *domain.Booking) error
 	Remove(bookingId string) error
 	CheckBookingExists(bookingId string) bool
 }
