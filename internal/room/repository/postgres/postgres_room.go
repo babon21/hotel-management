@@ -17,22 +17,10 @@ func NewPostgresRoomRepository(conn *sqlx.DB) usecase.RoomRepository {
 	return &postgresRoomRepository{conn}
 }
 
-//func (repo *postgresRoomRepository) CheckRoomExists(roomId string) bool {
-//	var booking domain.Room
-//	err := repo.Conn.Get(&booking, "SELECT * FROM room WHERE id = $1", roomId)
-//	if err != nil {
-//		return false
-//	}
-//	return true
-//}
-
 func (repo *postgresRoomRepository) CheckExistence(id string) bool {
 	var room domain.Room
 	err := repo.Conn.Get(&room, "SELECT * FROM room WHERE id = $1", id)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (repo *postgresRoomRepository) GetList(sortField usecase.SortField, sortOrder usecase.SortOrder) ([]domain.Room, error) {

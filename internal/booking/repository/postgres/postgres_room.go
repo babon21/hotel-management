@@ -18,10 +18,7 @@ func NewPostgresBookingRepository(conn *sqlx.DB) usecase.BookingRepository {
 func (repo *postgresBookingRepository) CheckBookingExists(bookingId string) bool {
 	var booking domain.Booking
 	err := repo.Conn.Get(&booking, "SELECT * FROM booking WHERE id = $1", bookingId)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (repo *postgresBookingRepository) GetList(roomId string) ([]domain.Booking, error) {
